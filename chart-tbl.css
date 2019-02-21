@@ -1,0 +1,12 @@
+table {width:98%}
+
+table tr:nth-child(even) {
+    background-color: #eee;
+  }
+  table tr:nth-child(odd) {
+   background-color: #ddd;
+  }
+  table th {
+    background-color: rgb(0, 0, 0);
+    color: white;
+  }
