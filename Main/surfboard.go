@@ -42,12 +42,12 @@ func main() {
 	//	output = join(output, notes)
 	//}
 
-	output := generateMap(projectpath, *releasePtr)
+	dependancies, notes := generateMap(projectpath, *releasePtr)
 
 	top := join("<html><head><link rel='stylesheet' href='chart-tbl.css'></head><body><h1>Surfboard for ", project, " Helm Chart</h1> <table>")
 	tail := "</body></html>"
 
-	output = join(top, output, tail)
+	output := join(top, dependancies, "</table>", notes, tail)
 	writeMap(output, project)
 
 	os.RemoveAll(projectpath)
@@ -63,17 +63,18 @@ func getTheChart(project string, ver string) {
 	}
 }
 
-func generateMap(projectpath string, notesDepth int) string {
+func generateMap(projectpath string, notesDepth int) (string, string) {
 	depth := 0
-	output := ""
+	dependancies := ""
+	notes := ""
 
 	visit := func(path string, info os.FileInfo, err error) error {
 
 		if info.IsDir() {
-			depth, output = processDir(path, depth, output)
+			depth, dependancies = processDir(path, depth, dependancies)
 		} else if info.Name() == "_release_notes.yaml" && depth <= notesDepth {
-			notes := generateReleaseNotes(path)
-			output = join(output, notes)
+			note := generateReleaseNotes(path)
+			notes = join(notes, note)
 		}
 		return nil
 	}
@@ -82,7 +83,7 @@ func generateMap(projectpath string, notesDepth int) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return output
+	return dependancies, notes
 }
 
 func processDir(path string, previousDepth int, output string) (int, string) {
@@ -117,7 +118,7 @@ func getConfig() config {
 
 func addEntry(config config, depth int) string {
 	pad := strings.Repeat("<td></td>", depth)
-	entry := join("<tr>", pad, "<td><h2>", config.name, "</h2>", config.version, "</br>", config.description, "</td></tr>")
+	entry := join("<tr>", pad, "<td><h2>", "<a href='#", config.name, "'>", config.name, "</a>", "</h2>", config.version, "</br>", config.description, "</td></tr>")
 	return entry
 }
 
@@ -157,7 +158,12 @@ func generateReleaseNotes(filename string) string {
 	}
 	defer file.Close()
 
-	output := join("<h2>Release Notes for ", filename, "</h2>")
+	parts := strings.Split(filename, "/")
+	n := len(parts)
+	service := parts[n-2]
+	println(service)
+
+	output := join("<h2>Release Notes for  <a name='", service, "'>", service, "</a> </h2>")
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		output = join(output, scanner.Text(), "</br>")
