@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -25,7 +26,7 @@ type config struct {
 
 func main() {
 
-	releasePtr := flag.Int("notes", 0, "used to switch on Release Note production")
+	releasePtr := flag.Bool("notes", false, "used to switch on Release Note production")
 	flag.Parse()
 
 	project := flag.Arg(0)
@@ -63,7 +64,7 @@ func getTheChart(project string, ver string) {
 	}
 }
 
-func generateMap(projectpath string, notesDepth int) (string, string) {
+func generateMap(projectpath string, releasenotes bool) (string, string) {
 	depth := 0
 	dependancies := ""
 	notes := ""
@@ -72,7 +73,7 @@ func generateMap(projectpath string, notesDepth int) (string, string) {
 
 		if info.IsDir() {
 			depth, dependancies = processDir(path, depth, dependancies)
-		} else if info.Name() == "_release_notes.yaml" && depth <= notesDepth {
+		} else if info.Name() == "_release_notes.yaml" && releasenotes {
 			note := generateReleaseNotes(path)
 			notes = join(notes, note)
 		}
@@ -151,6 +152,11 @@ func writeMap(output string, project string) {
 }
 
 func generateReleaseNotes(filename string) string {
+
+	// Could get issue summary if logged in
+	// https://jira.ipttools.info/rest/api/latest/issue/EE-15620?fields=summary
+	//curl "https://<user>:<password>@jira.ipttools.info/rest/api/latest/issue/EE-15620?fields=summary"
+
 	println("Generate Release Notes")
 	file, err := os.Open(filename)
 	if err != nil {
@@ -165,15 +171,48 @@ func generateReleaseNotes(filename string) string {
 
 	output := join("<h2>Release Notes for  <a name='", service, "'>", service, "</a> </h2>")
 	scanner := bufio.NewScanner(file)
+	issuepattern, _ := regexp.Compile("[A-Z]{2,}-[0-9]{4,}")
+	versionpattern, _ := regexp.Compile("\\.[0-9]{0,3}-")
+	keys := make(map[string]bool)
 	for scanner.Scan() {
-		output = join(output, scanner.Text(), "</br>")
+		entry := scanner.Text()
+		if versionpattern.MatchString(entry) {
+			if !strings.Contains(entry, "JENKINS") {
+				keys = make(map[string]bool)
+				output = join(output, entry, "</br>")
+			}
+		} else {
+			entry := issuepattern.FindString(scanner.Text())
+			if _, value := keys[entry]; !value {
+				keys[entry] = true
+				output = join(output, "&nbsp;&nbsp;&nbsp<a href='https://jira.ipttools.info/browse/", entry, "' target='_blank'>", entry, "</a>", "</br>")
+			}
+		}
 	}
-
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 
-	regxpattern, _ := regexp.Compile(" [0-9a-f]*:")
-	output = regxpattern.ReplaceAllString(output, " ")
 	return output
+}
+
+func unique(sSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range sSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+func getJiraSummary(user string, password string, ticket string) {
+	url := join("'https://", user, ":", password, "@jira.ipttools.info/rest/api/latest/issue/", ticket, "?fields=summary'")
+	resp, err := http.Get(url)
+	if err != nil {
+		// handle err
+	}
+	defer resp.Body.Close()
 }
