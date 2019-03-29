@@ -18,5 +18,7 @@ python create_Confluence_Page.py Space_ID ParentPage_ID ProjectName
   python create_Confluence_Page.py SC 127644266 Status
   
 Requires Environment  Variables:
+
 ..* CONF_USER
+
 ..* CONF_PASSWORD
