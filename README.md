@@ -10,6 +10,8 @@ Release notes show all historic releases, listing the Jira ticket numbers in eac
 Version Routing
 the option -routes can be used to include version routing information in the output
 
+-silent (default = true) Supresses the output of HTML file.
+
 note the chart must exist in your chart museum
 
 ## Posting to Confluence 
