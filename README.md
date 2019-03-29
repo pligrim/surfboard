@@ -11,3 +11,8 @@ Version Routing
 the option -routes can be used to include version routing information in the output
 
 note the chart must exist in your chart museum
+
+## Posting to Confluence 
+python create_Confluence_Page.py Space_ID ParentPage_ID ProjectName
+
+  python create_Confluence_Page.py SC 127644266 Status
