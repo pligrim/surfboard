@@ -33,8 +33,7 @@ type rulesStruc struct {
 func main() {
 
 	releasePtr := flag.Bool("notes", false, "used to switch on Release Note production")
-	userPtr := flag.String("user", "", "User name for jira user to collect ticket summary")
-	passPtr := flag.String("token", "", "Token for jira user to collect ticket summary")
+	silent := flag.Bool("silent", true, "Supresses the output of HTML file")
 	routesPtr := flag.Bool("routes", false, "if true will show version routing")
 
 	flag.Parse()
@@ -51,7 +50,7 @@ func main() {
 
 	projectpath := join("./", project)
 
-	dependancies, notes, routes := generateMap(projectpath, *releasePtr, *routesPtr, *userPtr, *passPtr)
+	dependancies, notes, routes := generateMap(projectpath, *releasePtr, *routesPtr)
 
 	tp1 := "<html><head><link rel='stylesheet' href='chart-tbl.css'></head><body>"
 	tp2 := join("<h1>Surfboard for ", project, " Helm Chart</h1> <table>")
@@ -60,8 +59,10 @@ func main() {
 	output := join(tp2, dependancies, "</table>", notes, routes)
 	writeMap(output, project, "insert")
 
-	output = join(tp1, output, tail)
-	writeMap(output, project, "html")
+	if !*silent {
+		output = join(tp1, output, tail)
+		writeMap(output, project, "html")
+	}
 
 	os.RemoveAll(projectpath)
 }
@@ -76,7 +77,7 @@ func getTheChart(path string, ver string) {
 	}
 }
 
-func generateMap(projectpath string, releasenotes bool, versionroutes bool, user string, password string) (string, string, string) {
+func generateMap(projectpath string, releasenotes bool, versionroutes bool) (string, string, string) {
 	depth := 0
 	dependancies := ""
 	notes := ""
@@ -90,7 +91,7 @@ func generateMap(projectpath string, releasenotes bool, versionroutes bool, user
 			route := routes(path, info.Name())
 			routing = join(routing, route)
 		} else if info.Name() == "_release_notes.yaml" && releasenotes {
-			note := generateReleaseNotes(path, user, password)
+			note := generateReleaseNotes(path)
 			notes = join(notes, note)
 		}
 		return nil
@@ -169,7 +170,7 @@ func writeMap(output string, project string, extn string) {
 	println("map created")
 }
 
-func generateReleaseNotes(filename string, user string, password string) string {
+func generateReleaseNotes(filename string) string {
 
 	println("Generate Release Notes")
 	file, err := os.Open(filename)
