@@ -18,5 +18,6 @@ matrix:
       file: surfboard_*
       skip_cleanup: true
       on:
+        tags: true
         branch: master
   - go: master
