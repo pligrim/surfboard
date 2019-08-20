@@ -18,7 +18,5 @@ matrix:
       file: surfboard_*
       skip_cleanup: true
       on:
-        tags: true
-        repo: pligrim/surfboard
         branch: master
   - go: master
