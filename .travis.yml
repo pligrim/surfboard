@@ -20,4 +20,3 @@ matrix:
       on:
         tags: true
         branch: master
-  - go: master
