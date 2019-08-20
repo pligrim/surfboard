@@ -1,4 +1,8 @@
 language: go
+branches:
+    only:
+    - master
+    - /v\d+\.\d+[a-z]/
 env:
  - GO111MODULE=on
 go_import_path: https://github.com/pligrim/Main/surfboard
