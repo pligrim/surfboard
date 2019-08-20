@@ -34,7 +34,7 @@ func main() {
 
 	releasePtr := flag.Bool("notes", false, "used to switch on Release Note production")
 	silent := flag.Bool("silent", true, "Supresses the output of HTML file")
-	routesPtr := flag.Bool("routes", false, "if true will show the version routing")
+	routesPtr := flag.Bool("routes", false, "if true will show version routing")
 
 	flag.Parse()
 
