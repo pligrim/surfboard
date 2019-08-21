@@ -12,8 +12,8 @@ matrix:
   - go: '1.12'
     name: Deployment
     before_deploy:
-    - CGO_ENABLED=0 GOARCH=386 go build Main/surfboard.go -ldflags="-s -w" -o "surfboard_i386"
-    - CGO_ENABLED=0 GOARCH=amd64 go build Main/surfboard.go -ldflags="-s -w" -o "surfboard_amd64"
+    - CGO_ENABLED=0 GOARCH=386 go build  -ldflags="-s -w" -o "surfboard_i386"
+    - CGO_ENABLED=0 GOARCH=amd64 go build  -ldflags="-s -w" -o "surfboard_amd64"
     deploy:
       provider: releases
       api_key: 5229c1e15bc7797def97e967d87dce8893ce5085
