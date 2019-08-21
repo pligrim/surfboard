@@ -12,7 +12,7 @@ matrix:
   - go: '1.12'
     name: Deployment
     before_deploy:
-    - CGO_ENABLED=0 GOARCH=linux go build Main -ldflags="-s -w" -o "surfboard_linux"
+    - CGO_ENABLED=0 GOARCH=386 go build Main -ldflags="-s -w" -o "surfboard_i386"
     - CGO_ENABLED=0 GOARCH=amd64 go build Main -ldflags="-s -w" -o "surfboard_amd64"
     deploy:
       provider: releases
