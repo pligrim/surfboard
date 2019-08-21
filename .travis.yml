@@ -5,7 +5,7 @@ branches:
     - /v\d+\.\d+\.\d+/
 env:
  - GO111MODULE=on
-go_import_path: https://github.com/pligrim/Main/surfboard
+go_import_path: https://github.com/pligrim/surfboard
 matrix:
   fast_finish: true
   include:
