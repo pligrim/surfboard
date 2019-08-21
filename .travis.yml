@@ -16,7 +16,7 @@ matrix:
     - CGO_ENABLED=0 GOARCH=amd64 go build  -ldflags="-s -w" -o "surfboard_amd64"
     deploy:
       provider: releases
-      api_key: 726783558b717f24b946638d7d644cd9193f3292
+      api_key: 7
       file_glob: true
       file: surfboard_*
       skip_cleanup: true
