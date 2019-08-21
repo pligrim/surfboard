@@ -9,7 +9,6 @@ go_import_path: https://github.com/pligrim/Main/surfboard
 matrix:
   fast_finish: true
   include:
-  - go: '1.11'
   - go: '1.12'
     name: Deployment
     before_deploy:
@@ -23,4 +22,5 @@ matrix:
       skip_cleanup: true
       on:
         tags: true
+        repo: pligrim/surfboard
         branch: master
